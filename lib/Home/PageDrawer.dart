@@ -1,8 +1,10 @@
 import 'package:collagekit/Auth_pages/loginPage.dart';
 import 'package:collagekit/Home/HomePage.dart';
 import 'package:collagekit/Home/UploadeNotes.dart';
+import 'package:collagekit/Home/aboutUs.dart';
+import 'package:collagekit/Home/myDownloade.dart';
+import 'package:collagekit/Home/settings.dart';
 import 'package:collagekit/services/auth_services.dart';
-import 'package:collagekit/testhome.dart';
 import 'package:flutter/material.dart';
 
 class Pagedrawer extends StatefulWidget {
@@ -42,13 +44,19 @@ class _PagedrawerState extends State<Pagedrawer> {
               );
             },
           ),
-          ListTile(
-            leading: Icon(Icons.picture_as_pdf),
-            title: Text('My Downloades'),
-            onTap: () {
-              // Handle settings item tap.
-            },
-          ),
+          //underDevopment for offline access
+
+          // ListTile(
+          //   leading: Icon(Icons.picture_as_pdf),
+          //   title: Text('My Downloades'),
+          //   onTap: () {
+          //     Navigator.pushReplacement(
+          //       context,
+          //       MaterialPageRoute(builder: (context) => Mydownloades()),
+          //     );
+          //     // Handle settings item tap.
+          //   },
+          // ),
           ListTile(
             leading: Icon(Icons.upload),
             title: Text('Uploade Notes'),
@@ -63,10 +71,23 @@ class _PagedrawerState extends State<Pagedrawer> {
             leading: Icon(Icons.settings),
             title: Text('Settings'),
             onTap: () {
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(builder: (context) => settings()),
+              );
               // Handle settings item tap.
             },
           ),
-
+          ListTile(
+            leading: Icon(Icons.book),
+            title: Text('About Us'),
+            onTap: () {
+              Navigator.of(context).pushAndRemoveUntil(
+                MaterialPageRoute(builder: (context) => Aboutus()),
+                (Route<dynamic> route) => false, // Remove all existing routes
+              );
+            },
+          ),
           ListTile(
             leading: Icon(Icons.logout),
             title: Text('Log Out'),
