@@ -17,7 +17,6 @@ class Uploadenotes extends StatefulWidget {
 class _UploadenotesState extends State<Uploadenotes> {
   final Notekey = GlobalKey<FormState>();
   TextEditingController _subjectController = TextEditingController();
-  TextEditingController _testController = TextEditingController();
   late SingleValueDropDownController _semesterController;
   late SingleValueDropDownController _collagenameController;
   late List<DropDownValueModel> _semlist;
@@ -27,9 +26,10 @@ class _UploadenotesState extends State<Uploadenotes> {
   CollageServices services = CollageServices();
   bool isFilePicked = false;
   FilePickerResult? result;
-  storageServices storeageservices = storageServices();
+  StorageServices storeageservices = StorageServices();
   bool _collagedataready = false;
 
+  @override
   void initState() {
     super.initState();
     _semesterController = SingleValueDropDownController();
@@ -51,10 +51,9 @@ class _UploadenotesState extends State<Uploadenotes> {
 
   void _initilizecollageList() async {
     _collagenames = await services.getCollagesNames();
-    _collagenamesmodel = _collagenames.map((semester) {
-      return DropDownValueModel(name: semester, value: semester);
+    _collagenamesmodel = _collagenames.map((college) {
+      return DropDownValueModel(name: college, value: college);
     }).toList();
-    print(_collagenamesmodel);
     setState(() {
       _collagedataready = true;
     });
@@ -62,10 +61,10 @@ class _UploadenotesState extends State<Uploadenotes> {
 
   Future<void> pickFile() async {
     try {
-      result = await FilePicker.platform.pickFiles();
+      result = await FilePicker.platform.pickFiles(withData: true);
       if (result != null) {
         setState(() {
-          isFilePicked = true; // Set the flag to true
+          isFilePicked = true;
         });
         print('File picked: ${result!.files.first.name}');
       } else {
@@ -80,74 +79,96 @@ class _UploadenotesState extends State<Uploadenotes> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Uploade note"),
+        title: Text("Upload note"),
         centerTitle: true,
       ),
       drawer: Pagedrawer(),
       body: OrientationBuilder(
         builder: (context, orientation) {
           return Form(
-              key: Notekey,
-              child: Column(
-                children: [
-                  const Text("Collage"),
-                  DropDownTextField(
-                    controller: _collagenameController,
-                    enableSearch: true,
-                    dropDownList: _collagedataready
-                        ? _collagenamesmodel
-                        : [], // Provide your list of collages here
-                  ),
-                  const Text('Semester'),
-                  DropDownTextField(
-                    enableSearch: true,
-                    controller: _semesterController,
-                    dropDownList: _dataReady ? _semlist : [],
-                  ),
-                  const Text("subject"),
-                  TextFormField(
-                    controller: _subjectController,
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Enter  subject name';
-                      }
-                      return null;
-                    },
-                  ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Visibility(
-                        visible: !isFilePicked ? true : false,
-                        child: TextButton(
-                          onPressed: isFilePicked ? null : pickFile,
-                          // Disable the button if a file is already picked
-                          child: Text('Pick a file to upload'),
-                        ),
+            key: Notekey,
+            child: Column(
+              children: [
+                const Text("College"),
+                DropDownTextField(
+                  controller: _collagenameController,
+                  enableSearch: true,
+                  dropDownList: _collagedataready ? _collagenamesmodel : [],
+                ),
+                const Text('Semester'),
+                DropDownTextField(
+                  enableSearch: true,
+                  controller: _semesterController,
+                  dropDownList: _dataReady ? _semlist : [],
+                ),
+                const Text("Subject"),
+                TextFormField(
+                  controller: _subjectController,
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Enter subject name';
+                    }
+                    return null;
+                  },
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Visibility(
+                      visible: !isFilePicked,
+                      child: TextButton(
+                        onPressed: isFilePicked ? null : pickFile,
+                        child: Text('Pick a file to upload'),
                       ),
-                      if (isFilePicked)
-                        Text('Picked file: ${result!.files.first.name}'),
-                      Visibility(
-                        visible: isFilePicked ? true : false,
-                        child: TextButton(
-                            onPressed: () {
-                              pickFile();
-                            },
-                            child: Text("select another File")),
-                      )
-                    ],
-                  ),
-                  TextButton(
-                      onPressed: () {
-                        storeageservices.UploadeFile(
-                            collage: _subjectController.text,
-                            Semester: int.parse(_testController.text),
-                            Subject: _subjectController.text,
-                            File: result!);
-                      },
-                      child: Text("Uploade"))
-                ],
-              ));
+                    ),
+                    if (isFilePicked)
+                      Text('Picked file: ${result!.files.first.name}'),
+                    Visibility(
+                      visible: isFilePicked,
+                      child: TextButton(
+                        onPressed: pickFile,
+                        child: Text("Select another file"),
+                      ),
+                    ),
+                  ],
+                ),
+                TextButton(
+                  onPressed: () async {
+                    if (Notekey.currentState!.validate()) {
+                      if (_collagenameController.dropDownValue == null) {
+                        print('College not selected');
+                        return;
+                      }
+
+                      if (_semesterController.dropDownValue == null) {
+                        print('Semester not selected');
+                        return;
+                      }
+
+                      if (!isFilePicked || result == null) {
+                        print('No file selected');
+                        return;
+                      }
+
+                      try {
+                        await storeageservices.uploadFile(
+                          collage: _collagenameController.dropDownValue!.value,
+                          semester: int.parse(
+                              _semesterController.dropDownValue!.value),
+                          subject: _subjectController.text,
+                          file: result!,
+                        );
+                        print('File uploaded successfully');
+                      } catch (e) {
+                        print('Error uploading file: $e');
+                      }
+                    }
+                  },
+                  child: Text("Upload"),
+                ),
+              ],
+            ),
+          );
         },
       ),
     );
