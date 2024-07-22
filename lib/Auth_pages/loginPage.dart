@@ -68,6 +68,7 @@ class _LoginpageState extends State<Loginpage> {
                             return null;
                           },
                         ),
+                        const SizedBox(height: 16),
                         TextButton(
                             onPressed: () async {
                               if (Loginkey.currentState!.validate()) {
@@ -110,7 +111,14 @@ class _LoginpageState extends State<Loginpage> {
                                 }
                               }
                             },
-                            child: Text('Login')),
+                            child: Container(
+                              height: 50,
+                              width: double.infinity,
+                              decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(10),
+                                  color: Color.fromRGBO(83, 86, 255, 1)),
+                              child: Center(child: Text("Login")),
+                            )),
                         Expanded(child: SizedBox()),
                         GestureDetector(
                           child: Text('Dont Have Account? Register now'),

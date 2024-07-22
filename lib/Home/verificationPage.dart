@@ -37,14 +37,14 @@ class _VerificationpageState extends State<Verificationpage> {
         body: OrientationBuilder(builder: (context, orientation) {
           return Column(
             children: [
-              Padding(
-                padding: const EdgeInsets.all(8.0),
+              const Padding(
+                padding: EdgeInsets.all(8.0),
                 child: Center(
                   child: Text(
                       'Please check your Email for verification || if already verified please user singout button at top right to go back to singin/Login Page'),
                 ),
               ),
-              SizedBox(
+              const SizedBox(
                 height: 10,
               ),
               TextButton(

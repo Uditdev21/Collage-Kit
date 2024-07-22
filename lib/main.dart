@@ -1,6 +1,7 @@
 import 'package:collagekit/Auth_pages/loginPage.dart';
 import 'package:collagekit/Home/HomePage.dart';
 import 'package:collagekit/Home/verificationPage.dart';
+import 'package:collagekit/Theme/Theme.dart';
 import 'package:collagekit/services/auth_services.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -59,13 +60,10 @@ class _MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      debugShowCheckedModeBanner: true,
+      debugShowCheckedModeBanner: false,
       title: 'Collage Kit',
-      theme: ThemeData(
-        colorScheme:
-            ColorScheme.fromSeed(seedColor: Color.fromARGB(255, 247, 3, 3)),
-        useMaterial3: true,
-      ),
+      theme: LightTheme,
+      darkTheme: DarkTheme,
       home: isLogin
           ? (isVerified ? Homepage() : Verificationpage())
           : Loginpage(),

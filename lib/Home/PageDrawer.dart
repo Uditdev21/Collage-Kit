@@ -2,7 +2,7 @@ import 'package:collagekit/Auth_pages/loginPage.dart';
 import 'package:collagekit/Home/HomePage.dart';
 import 'package:collagekit/Home/UploadeNotes.dart';
 import 'package:collagekit/Home/aboutUs.dart';
-import 'package:collagekit/Home/myDownloade.dart';
+import 'package:collagekit/Home/myUploades.dart';
 import 'package:collagekit/Home/settings.dart';
 import 'package:collagekit/services/auth_services.dart';
 import 'package:flutter/material.dart';
@@ -24,11 +24,7 @@ class _PagedrawerState extends State<Pagedrawer> {
         children: [
           DrawerHeader(
             decoration: BoxDecoration(
-              color: Colors.blue,
-              // image: DecorationImage(
-              //   image: AssetImage('asset/logo.png'), // Add your logo image
-              //   fit: BoxFit.cover,
-              // ),
+              color: Color.fromRGBO(83, 86, 255, 1),
             ),
             child: Center(
                 child:
@@ -65,6 +61,18 @@ class _PagedrawerState extends State<Pagedrawer> {
                 MaterialPageRoute(builder: (context) => Uploadenotes()),
                 (Route<dynamic> route) => false, // Remove all existing routes
               );
+            },
+          ),
+          ListTile(
+            leading: Icon(Icons.my_library_add),
+            title: Text('my uploades'),
+            onTap: () async {
+              try {
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(builder: (context) => Myuploades()),
+                );
+              } catch (e) {}
             },
           ),
           ListTile(

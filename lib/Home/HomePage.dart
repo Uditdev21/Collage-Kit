@@ -4,6 +4,8 @@ import 'package:collagekit/services/auth_services.dart';
 import 'package:collagekit/services/pdfViwer.dart';
 import 'package:collagekit/services/storage_services.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_launcher_icons/xml_templates.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 
 class Homepage extends StatefulWidget {
@@ -20,8 +22,12 @@ class _HomepageState extends State<Homepage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
-        title: Text("Home"),
+        title: Text(
+          "Home",
+          style: TextStyle(fontSize: 30),
+        ),
         centerTitle: true,
       ),
       drawer: Pagedrawer(),
@@ -89,13 +95,21 @@ class _HomepageState extends State<Homepage> {
                             documents[index].data() as Map<String, dynamic>;
                         return Container(
                           decoration: BoxDecoration(
-                              border: Border.all(),
-                              borderRadius: BorderRadius.circular(10)),
-                          height: 70,
+                              // border: Border.all(),
+                              borderRadius: BorderRadius.circular(10),
+                              boxShadow: [
+                                BoxShadow(
+                                    blurRadius: 04,
+                                    color: Color.fromRGBO(83, 86, 255, 1))
+                              ],
+                              color: Theme.of(context).primaryColor),
+                          height: 100,
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.spaceAround,
                             children: [
                               Column(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceAround,
                                 children: [
                                   Text('${data['Subject']}'),
                                   Text('${data['Collage']}'),
@@ -115,7 +129,26 @@ class _HomepageState extends State<Homepage> {
                                                       pdfUrl: data['FileURL'])),
                                         );
                                       },
-                                      child: Text('view')),
+                                      child: Container(
+                                        height: 50,
+                                        width: 100,
+                                        child: Center(
+                                            child: Text(
+                                          'View',
+                                          style: TextStyle(
+                                              color: Colors.white,
+                                              fontSize: 20),
+                                        )),
+                                        decoration: BoxDecoration(
+                                            color:
+                                                Color.fromRGBO(83, 86, 255, 1),
+                                            border: Border.all(
+                                                width: 5,
+                                                color: Color.fromRGBO(
+                                                    223, 245, 255, 1)),
+                                            borderRadius:
+                                                BorderRadius.circular(20)),
+                                      )),
 
                                   //for offline UNDER DEVELOPMENT
                                   // TextButton(

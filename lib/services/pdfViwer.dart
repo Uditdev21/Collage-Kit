@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_pdfview/flutter_pdfview.dart';
+// ignore: depend_on_referenced_packages
 import 'package:http/http.dart' as http;
 import 'package:path_provider/path_provider.dart';
 import 'dart:io';
@@ -7,14 +8,14 @@ import 'dart:io';
 class PDFViewerPage extends StatefulWidget {
   final String pdfUrl;
 
-  const PDFViewerPage({Key? key, required this.pdfUrl}) : super(key: key);
+  const PDFViewerPage({super.key, required this.pdfUrl});
 
   @override
   _PDFViewerPageState createState() => _PDFViewerPageState();
 }
 
 class _PDFViewerPageState extends State<PDFViewerPage> {
-  late PDFViewController _pdfViewController;
+  PDFViewController? _pdfViewController;
   int _pageNumber = 1;
   int _totalPages = 0;
   bool _isLoading = true;
@@ -50,63 +51,119 @@ class _PDFViewerPageState extends State<PDFViewerPage> {
   }
 
   @override
+  void dispose() {
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('PDF Viewer'),
+        title: const Text('PDF Viewer'),
         centerTitle: true,
       ),
-      body: Stack(
+      body: OrientationBuilder(
+        builder: (context, orientation) {
+          return Stack(
+            children: [
+              Container(
+                color:
+                    Colors.grey[200], // Set your desired background color here
+                child: _localFilePath != null
+                    ? PDFView(
+                        fitPolicy: FitPolicy.BOTH,
+                        fitEachPage: true,
+                        filePath: _localFilePath,
+                        autoSpacing: true,
+                        pageSnap: true,
+                        swipeHorizontal: true,
+                        onViewCreated: (PDFViewController vc) {
+                          _pdfViewController = vc;
+                          _fetchTotalPages();
+                        },
+                        onPageChanged: (int? page, int? total) {
+                          if (page != null) {
+                            setState(() {
+                              _pageNumber = page;
+                            });
+                          }
+                        },
+                        onRender: (pages) {
+                          _fetchTotalPages();
+                        },
+                        onError: (error) {
+                          print('Error loading PDF: $error');
+                          setState(() {
+                            _isLoading = false;
+                          });
+                        },
+                      )
+                    : const Center(child: CircularProgressIndicator()),
+              ),
+              if (_isLoading)
+                const Center(
+                  child: CircularProgressIndicator(),
+                ),
+            ],
+          );
+        },
+      ),
+      floatingActionButton: Column(
+        mainAxisAlignment: MainAxisAlignment.end,
         children: [
-          if (_localFilePath != null)
-            PDFView(
-              filePath: _localFilePath,
-              autoSpacing: true,
-              pageSnap: true,
-              swipeHorizontal: true,
-              onViewCreated: (PDFViewController vc) {
-                _pdfViewController = vc;
-                _fetchTotalPages();
-              },
-              onPageChanged: (int? page, int? total) {
-                if (page != null) {
-                  setState(() {
-                    _pageNumber = page;
-                  });
-                }
-              },
-              onRender: (_pages) {
-                setState(() {
-                  _isLoading = false;
-                });
-              },
-              onError: (error) {
-                print('Error loading PDF: $error');
-                setState(() {
-                  _isLoading = false;
-                });
-              },
-            ),
-          if (_isLoading)
-            Center(
-              child: CircularProgressIndicator(),
-            ),
+          FloatingActionButton(
+            heroTag: 'previousPage', // Unique heroTag
+            onPressed: _previousPage,
+            child: const Icon(Icons.arrow_upward),
+          ),
+          const SizedBox(height: 10),
+          FloatingActionButton(
+            heroTag: 'nextPage', // Unique heroTag
+            onPressed: _nextPage,
+            child: const Icon(Icons.arrow_downward),
+          ),
         ],
+      ),
+      bottomNavigationBar: BottomAppBar(
+        child: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Text(
+            'Page $_pageNumber of $_totalPages',
+            style: const TextStyle(fontSize: 16),
+            textAlign: TextAlign.center,
+          ),
+        ),
       ),
     );
   }
 
   Future<void> _fetchTotalPages() async {
     try {
-      int totalPages = await _pdfViewController.getPageCount() ?? 0;
-      setState(() {
-        _totalPages = totalPages;
-      });
+      if (_pdfViewController != null) {
+        int totalPages = await _pdfViewController!.getPageCount() ?? 0;
+        setState(() {
+          _totalPages = totalPages;
+        });
+      }
     } catch (e) {
       print('Error fetching total pages: $e');
       setState(() {
         _totalPages = 0;
       });
+    }
+  }
+
+  void _nextPage() async {
+    if (_pageNumber < _totalPages && _pdfViewController != null) {
+      await _pdfViewController!.setPage(_pageNumber + 1);
+      setState(() {});
+    }
+  }
+
+  void _previousPage() async {
+    if (_pageNumber > 0 && _pdfViewController != null) {
+      await _pdfViewController!.setPage(_pageNumber - 1);
+      setState(() {});
     }
   }
 }

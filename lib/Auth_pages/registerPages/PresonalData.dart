@@ -77,6 +77,9 @@ class _PersonalDataState extends State<PersonalData> {
                       return null;
                     },
                   ),
+                  SizedBox(
+                    height: 10,
+                  ),
                   const Text('Date of Birth'),
                   TextFormField(
                     decoration: const InputDecoration(
@@ -87,6 +90,9 @@ class _PersonalDataState extends State<PersonalData> {
                     controller: _dateController,
                     validator: _validateDate,
                     onTap: () => _selectDate(context),
+                  ),
+                  SizedBox(
+                    height: 20,
                   ),
                   TextButton(
                     onPressed: () {
@@ -102,7 +108,14 @@ class _PersonalDataState extends State<PersonalData> {
                         );
                       }
                     },
-                    child: const Text("Submit"),
+                    child: Container(
+                      height: 50,
+                      width: double.infinity,
+                      decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(10),
+                          color: Color.fromRGBO(83, 86, 255, 1)),
+                      child: Center(child: Text("Next")),
+                    ),
                   ),
                   Expanded(child: SizedBox()),
                   GestureDetector(
